@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -26,8 +28,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static const platform = const MethodChannel('flutter.native/helper');
+  static const launcherPlatform =
+      const MethodChannel('flutter.native/launcher');
+  static const resultsPlatform = const MethodChannel('flutter.native/results');
   String _responseFromNativeCode = 'Waiting for Response...';
+  Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             RaisedButton(
               child: Text('Call Native Method'),
-              onPressed: responseFromNativeCode,
+              onPressed: () async {
+                await _runNativeLauncher();
+              },
             ),
             Text(_responseFromNativeCode),
           ],
@@ -48,10 +60,24 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> responseFromNativeCode() async {
+  void _launchMonitoring() {
+    _timer = Timer.periodic(
+        Duration(milliseconds: 900), (Timer t) => _getResults());
+  }
+
+  Future<void> _runNativeLauncher() async {
+    try {
+      await launcherPlatform.invokeMethod('launchClient');
+      _launchMonitoring();
+    } on PlatformException catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _getResults() async {
     String response = "";
     try {
-      final String result = await platform.invokeMethod('launchClient');
+      final String result = await resultsPlatform.invokeMethod('getResults');
       response = result;
     } on PlatformException catch (e) {
       response = "Failed to Invoke: '${e.message}'.";
@@ -59,5 +85,11 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _responseFromNativeCode = response;
     });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 }
