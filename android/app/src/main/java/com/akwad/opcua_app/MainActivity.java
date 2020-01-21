@@ -48,6 +48,7 @@ public class MainActivity extends FlutterActivity {
     private ManagerOPC manager;
     private SessionChannel mySession;
     final private ArrayList<NodeId> nodeIdsList = new ArrayList<>();
+    final private ArrayList<String> results = new ArrayList<>();
 
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
@@ -60,6 +61,7 @@ public class MainActivity extends FlutterActivity {
                 (call, result) -> {
                     if (call.method.equals("launchClient")) {
                         new ConnectionTask().execute();
+                        result.success(null);
                     }
 
                 });
@@ -67,7 +69,7 @@ public class MainActivity extends FlutterActivity {
         new MethodChannel(getFlutterView(), RESULTS_CHANNEL).setMethodCallHandler(
                 (call, result) -> {
                     if (call.method.equals("getResults")) {
-                        result.success(message);
+                        result.success(results);
                     }
 
                 });
@@ -142,15 +144,14 @@ public class MainActivity extends FlutterActivity {
             mySession.activate();
             System.out.println("Statuss: " + "ACTIVATED");
 
-            //addNode("Simulation Examples.Functions.Ramp1");
-            //addNode("Simulation Examples.Functions.Ramp2");
-            //addNode("Simulation Examples.Functions.Ramp3");
-            //addNode("Simulation Examples.Functions.Ramp4");
+            addNode("Simulation Examples.Functions.Ramp1");
+            addNode("Simulation Examples.Functions.Ramp2");
+            addNode("Simulation Examples.Functions.Ramp3");
+            addNode("Simulation Examples.Functions.Ramp4");
             //addNode("Simulation Examples.Functions.Ramp5");
             //addNode("Simulation Examples.Functions.Ramp6");
             //addNode("Simulation Examples.Functions.Ramp7");
             //addNode("Simulation Examples.Functions.Ramp8");
-            addNode("Simulation Examples.Functions.Ramp1");
             startMonitoringForSession(mySession);
 
 
@@ -187,8 +188,8 @@ public class MainActivity extends FlutterActivity {
     void startMonitoringForSession(SessionChannel currentSession) {
 
         executor.scheduleAtFixedRate(() -> {
+            results.clear();
             for (NodeId nodeId : nodeIdsList) {
-
                 ReadValueId readValueId = new ReadValueId(nodeId, Attributes.Value, null, null);
 
                 ReadResponse res = null;
@@ -199,6 +200,7 @@ public class MainActivity extends FlutterActivity {
                 }
                 DataValue[] dataValue = res.getResults();
                 message = dataValue[0].getValue().toString();
+                results.add(message);
                 System.out.println(nodeId.getValue().toString().substring(30)+ " VALUE: " + message);
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);

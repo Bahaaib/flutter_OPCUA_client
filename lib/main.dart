@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -31,41 +33,55 @@ class _MyHomePageState extends State<MyHomePage> {
   static const launcherPlatform =
       const MethodChannel('flutter.native/launcher');
   static const resultsPlatform = const MethodChannel('flutter.native/results');
-  String _responseFromNativeCode = 'Waiting for Response...';
   Timer _timer;
+  final _nodesList = List<dynamic>();
+  bool _isLoading = false;
 
   @override
   void initState() {
+    _nodesList.clear();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Material(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RaisedButton(
-              child: Text('Call Native Method'),
-              onPressed: () async {
-                await _runNativeLauncher();
-              },
-            ),
-            Text(_responseFromNativeCode),
-          ],
+    return ModalProgressHUD(
+      inAsyncCall: _isLoading,
+      child: Material(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              RaisedButton(
+                child: Text('Start Monitoring'),
+                onPressed: () async {
+                  await _runNativeLauncher();
+                },
+              ),
+              Column(
+                children: _nodesList
+                    .map(
+                      (node) => Text(node),
+                    )
+                    .toList(),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
   void _launchMonitoring() {
-    _timer = Timer.periodic(
-        Duration(milliseconds: 900), (Timer t) => _getResults());
+    _timer =
+        Timer.periodic(Duration(milliseconds: 1000), (Timer t) => _getResults());
   }
 
   Future<void> _runNativeLauncher() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       await launcherPlatform.invokeMethod('launchClient');
       _launchMonitoring();
@@ -75,16 +91,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _getResults() async {
-    String response = "";
     try {
-      final String result = await resultsPlatform.invokeMethod('getResults');
-      response = result;
+      final result = await resultsPlatform.invokeMethod('getResults');
+      if((result as List).isNotEmpty){
+        setState(() {
+          _isLoading = false;
+          _nodesList.clear();
+          _nodesList.addAll(result);
+        });
+      }
+
     } on PlatformException catch (e) {
-      response = "Failed to Invoke: '${e.message}'.";
+      print(e);
     }
-    setState(() {
-      _responseFromNativeCode = response;
-    });
   }
 
   @override
