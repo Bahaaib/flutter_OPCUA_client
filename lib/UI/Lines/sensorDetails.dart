@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:ocpua_app/PODO/Sensor.dart';
 import 'package:ocpua_app/UI/Lines/chart.dart';
-import 'package:ocpua_app/bloc/points/points_bloc.dart';
-import 'package:ocpua_app/bloc/points/points_state.dart';
 import 'package:ocpua_app/bloc/sensors/sensors_bloc.dart';
 import 'package:ocpua_app/bloc/sensors/sensors_event.dart';
 import 'package:ocpua_app/bloc/sensors/sensors_state.dart';

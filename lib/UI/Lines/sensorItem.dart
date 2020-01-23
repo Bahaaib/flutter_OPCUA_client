@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ocpua_app/PODO/Sensor.dart';
 import 'package:ocpua_app/UI/Lines/chart.dart';
 import 'package:ocpua_app/UI/Lines/sensorDetails.dart';
-import 'package:ocpua_app/bloc/points/points_bloc.dart';
 
 class SensorItem extends StatefulWidget {
   const SensorItem({this.sensor, this.index});
@@ -15,11 +14,7 @@ class SensorItem extends StatefulWidget {
 }
 
 class _SensorItemState extends State<SensorItem> {
-  PointsBloc bloc;
   List<LinearData> data = new List<LinearData>();
-
-  var x = 3;
-  var y = 25;
 
   void initState() {
     super.initState();
