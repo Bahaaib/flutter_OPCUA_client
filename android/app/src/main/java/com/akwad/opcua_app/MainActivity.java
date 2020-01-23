@@ -111,7 +111,7 @@ public class MainActivity extends FlutterActivity {
             System.out.println("discoverEndpoints...");
             /////////// DISCOVER ENDPOINT ////////
             // Discover endpoints
-            EndpointDescription[] endpoints = mClient.discoverEndpoints("opc.tcp://192.168.1.7:49320");
+            EndpointDescription[] endpoints = mClient.discoverEndpoints("opc.tcp://192.168.1.2:49320");
             System.out.println("STEP 1...");
             // Filter out all but opc.tcp protocol endpoints
             endpoints = EndpointUtil.selectByProtocol(endpoints, "opc.tcp");
@@ -148,10 +148,11 @@ public class MainActivity extends FlutterActivity {
             addNode("Simulation Examples.Functions.Ramp2");
             addNode("Simulation Examples.Functions.Ramp3");
             addNode("Simulation Examples.Functions.Ramp4");
-            //addNode("Simulation Examples.Functions.Ramp5");
-            //addNode("Simulation Examples.Functions.Ramp6");
-            //addNode("Simulation Examples.Functions.Ramp7");
-            //addNode("Simulation Examples.Functions.Ramp8");
+            addNode("Simulation Examples.Functions.Ramp5");
+            addNode("Simulation Examples.Functions.Ramp6");
+            addNode("Simulation Examples.Functions.Ramp7");
+            addNode("Simulation Examples.Functions.Ramp8");
+            addNode("Simulation Examples.Functions.User1");
             startMonitoringForSession(mySession);
 
 
