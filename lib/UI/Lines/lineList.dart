@@ -1,10 +1,11 @@
-
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:ocpua_app/PODO/Line.dart';
+import 'package:ocpua_app/PODO/Lines.dart';
 import 'package:ocpua_app/PODO/Sensor.dart';
 import 'package:ocpua_app/UI/Lines/lineItem.dart';
+import 'package:ocpua_app/bloc/line/bloc.dart';
 import 'package:ocpua_app/resources/string.dart';
-
 
 class LineList extends StatefulWidget {
   @override
@@ -13,21 +14,17 @@ class LineList extends StatefulWidget {
 
 class _LineListState extends State<LineList> {
   List<Line> linesList = List<Line>();
+  final LineBloc _linesBloc = GetIt.instance<LineBloc>();
+  Lines _lines;
 
   void initState() {
-    final _sensor1 = Sensor("Simulation Examples.Functions.Ramp1", "");
-    final _sensor2 = Sensor("Simulation Examples.Functions.Ramp2", "");
+    _linesBloc.linesStateSubject.listen((receivedState) {
+      if (receivedState is LinesAreFetched) {
+        _lines = receivedState.lines;
+      }
+    });
 
-    final _line1 = Line(1, '1', 'Line One', [_sensor1]);
-    final _line2 = Line(2, '2', 'Line Two', [_sensor2]);
-
-    linesList.add(_line1);
-    linesList.add(_line2);
-    linesList.add(_line1);
-    linesList.add(_line2);
-    linesList.add(_line1);
-    linesList.add(_line2);
-    linesList.add(_line1);
+    _linesBloc.dispatch(LinesRequested());
 
     super.initState();
   }
@@ -48,7 +45,7 @@ class _LineListState extends State<LineList> {
                 padding: EdgeInsets.only(top: 20),
                 itemCount: linesList.length,
                 itemBuilder: (BuildContext context, int i) {
-                  return LineItem(line: linesList.elementAt(i));
+                  return LineItem(line: _lines.linesList.elementAt(i));
                 }),
           ),
           logoutButton(),

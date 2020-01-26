@@ -26,6 +26,12 @@ dependencies:
   json_serializable: ^3.2.3
   charts_flutter: ^0.8.1
   rxdart: 0.22.2
+  http_logger: 1.0.0
+  shared_preferences: ^0.5.4+5
+  get_it:
+  google_sign_in: any
+
+
 
 
 

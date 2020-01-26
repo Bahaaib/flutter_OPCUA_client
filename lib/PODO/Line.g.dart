@@ -8,19 +8,12 @@ part of 'Line.dart';
 
 Line _$LineFromJson(Map<String, dynamic> json) {
   return Line(
-    json['id'] as int,
-    json['endPoint'] as String,
+    json['ip'] as String,
     json['name'] as String,
-    (json['sensors'] as List)
-        ?.map((e) =>
-            e == null ? null : Sensor.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
   );
 }
 
 Map<String, dynamic> _$LineToJson(Line instance) => <String, dynamic>{
-      'id': instance.id,
-      'endPoint': instance.endPoint,
+      'ip': instance.ip,
       'name': instance.name,
-      'sensors': instance.sensors,
     };

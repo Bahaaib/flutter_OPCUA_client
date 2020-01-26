@@ -5,17 +5,10 @@ part 'Line.g.dart';
 
 @JsonSerializable()
 class Line {
-  int id;
-  String endPoint;
+  String ip;
   String name;
-  List<Sensor> sensors;
 
-  Line(
-    this.id,
-    this.endPoint,
-    this.name,
-    this.sensors,
-  );
+  Line(this.ip, this.name);
 
   factory Line.fromJson(Map<String, dynamic> json) => _$LineFromJson(json);
 
