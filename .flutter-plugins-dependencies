@@ -1,1 +1,0 @@
-{"_info":"// This is a generated file; do not edit or check into version control.","dependencyGraph":[{"name":"google_sign_in","dependencies":[]},{"name":"shared_preferences","dependencies":["shared_preferences_macos"]},{"name":"shared_preferences_macos","dependencies":[]}]}

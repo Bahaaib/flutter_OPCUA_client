@@ -1,26 +1,26 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:ocpua_app/PODO/Sensor.dart';
+import 'package:ocpua_app/PODO/Signal.dart';
 import 'package:ocpua_app/UI/Lines/chart.dart';
-import 'package:ocpua_app/bloc/sensors/sensors_bloc.dart';
-import 'package:ocpua_app/bloc/sensors/sensors_event.dart';
-import 'package:ocpua_app/bloc/sensors/sensors_state.dart';
+import 'package:ocpua_app/bloc/signals/signals_bloc.dart';
+import 'package:ocpua_app/bloc/signals/signals_event.dart';
+import 'package:ocpua_app/bloc/signals/signals_state.dart';
 
-class SensorDetails extends StatefulWidget {
-  const SensorDetails({this.index});
+
+class SignalDetails extends StatefulWidget {
+  const SignalDetails({this.index});
 
   final int index;
 
   @override
-  _SensorDetailsState createState() => _SensorDetailsState();
+  _SignalDetailsState createState() => _SignalDetailsState();
 }
 
-class _SensorDetailsState extends State<SensorDetails> {
-  final _sensorsBloc = SensorsBloc.instance();
-  Sensor _sensor;
+class _SignalDetailsState extends State<SignalDetails> {
+  final _signalsBloc = SignalsBloc.instance();
+  Signal _signal;
   final _data = List<LinearData>();
   Timer _timer;
   int _secondsElapsed = 0;
@@ -28,18 +28,18 @@ class _SensorDetailsState extends State<SensorDetails> {
 
   void initState() {
     _launchSecondsTimer();
-    _sensorsBloc.chartStateSubject.listen((receivedState) {
-      if (receivedState is SensorsDataAreFetched) {
+    _signalsBloc.chartStateSubject.listen((receivedState) {
+      if (receivedState is SignalsDataAreFetched) {
         if (mounted) {
           setState(() {
-            _sensor = receivedState.sensorsList[widget.index];
+            _signal = receivedState.signalsList[widget.index];
             _data.add(
-                LinearData(_secondsElapsed, _getEvaluatedData(_sensor.value)));
+                LinearData(_secondsElapsed, _getEvaluatedData(_signal.value)));
           });
         }
       }
     });
-    _sensorsBloc.dispatch(ChartDataRequested());
+    _signalsBloc.dispatch(ChartDataRequested());
     super.initState();
   }
 
@@ -70,7 +70,7 @@ class _SensorDetailsState extends State<SensorDetails> {
   List<charts.Series<LinearData, int>> _createSampleData() {
     return [
       new charts.Series<LinearData, int>(
-        id: 'sensors',
+        id: 'signals',
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
         domainFn: (LinearData data, _) => data.xAxis,
         measureFn: (LinearData data, _) => data.yAxis,
@@ -90,7 +90,7 @@ class _SensorDetailsState extends State<SensorDetails> {
               Navigator.pop(context, true);
             }),
         backgroundColor: Colors.red,
-        title: Text('Test Sensor'),
+        title: Text('Test Signal'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(

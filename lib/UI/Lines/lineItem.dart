@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ocpua_app/PODO/Line.dart';
-import 'package:ocpua_app/UI/Lines/sensorList.dart';
+import 'package:ocpua_app/UI/Lines/signalList.dart';
 
 
 class LineItem extends StatefulWidget {
@@ -22,7 +22,7 @@ class _LineItemState extends State<LineItem> {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return SensorList(
+              return SignalList(
                 line: widget.line,
               );
             },

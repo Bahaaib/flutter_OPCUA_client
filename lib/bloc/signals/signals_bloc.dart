@@ -1,40 +1,41 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:ocpua_app/PODO/Sensor.dart';
+import 'package:ocpua_app/PODO/Signal.dart';
 import 'package:ocpua_app/bloc/bloc.dart';
-import 'package:ocpua_app/bloc/sensors/bloc.dart';
+import 'package:ocpua_app/bloc/signals/bloc.dart';
+import 'package:ocpua_app/bloc/signals/signals_state.dart';
 import 'package:rxdart/rxdart.dart';
 
-class SensorsBloc extends BLoC<SensorsEvent> {
+class SignalsBloc extends BLoC<SignalsEvent> {
   ///init as singleton
-  static SensorsBloc _sensorsBloc;
+  static SignalsBloc _signalsBloc;
 
-  static SensorsBloc instance() {
-    if (_sensorsBloc == null) {
+  static SignalsBloc instance() {
+    if (_signalsBloc == null) {
       //print('CREATING NEW BLOC..');
-      _sensorsBloc = SensorsBloc._();
+      _signalsBloc = SignalsBloc._();
     }
-    return _sensorsBloc;
+    return _signalsBloc;
   }
 
-  SensorsBloc._();
+  SignalsBloc._();
 
   static const launcherPlatform =
   const MethodChannel('flutter.native/launcher');
   static const resultsPlatform = const MethodChannel('flutter.native/results');
   Timer _timer;
   final _nodesList = List<dynamic>();
-  final _sensorsList = List<Sensor>();
+  final _signalsList = List<Signal>();
   bool isAppTerminated = true;
   AppState appState = AppState.NEW_INSTANCE;
 
-  final sensorsStateSubject = PublishSubject<SensorsState>();
-  final chartStateSubject = PublishSubject<SensorsState>();
+  final signalsStateSubject = PublishSubject<SignalsState>();
+  final chartStateSubject = PublishSubject<SignalsState>();
 
   @override
-  void dispatch(SensorsEvent event) async {
-    if (event is SensorsDataRequested) {
+  void dispatch(SignalsEvent event) async {
+    if (event is SignalsDataRequested) {
       await _runNativeLauncher();
     }
 
@@ -65,26 +66,26 @@ class SensorsBloc extends BLoC<SensorsEvent> {
       if ((result as List).isNotEmpty) {
         _nodesList.clear();
         _nodesList.addAll(result);
-        getSensorsList(_nodesList);
+        getSignalsList(_nodesList);
         print('NODES SIZE = ${_nodesList.length}');
 
-        sensorsStateSubject.add(SensorsDataAreFetched(_sensorsList));
-        chartStateSubject.add(SensorsDataAreFetched(_sensorsList));
+        signalsStateSubject.add(SignalsDataAreFetched(_signalsList));
+        chartStateSubject.add(SignalsDataAreFetched(_signalsList));
       }
     } on PlatformException catch (e) {
       print(e);
     }
   }
 
-  void getSensorsList(List<dynamic> nodes) {
-    _sensorsList.clear();
+  void getSignalsList(List<dynamic> nodes) {
+    _signalsList.clear();
     for (var node in nodes) {
-      _sensorsList.add(Sensor("Ramp", node.toString()));
+      //_sensorsList.add(Signal("Ramp", node.toString()));
     }
   }
 
   void dispose() {
-    sensorsStateSubject.close();
+    signalsStateSubject.close();
     chartStateSubject.close();
   }
 }

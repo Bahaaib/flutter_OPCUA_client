@@ -23,9 +23,15 @@ class LineBloc extends BLoC<LineEvent> {
   }
 
   void _initLineQuery() {
-    _clientQuery = Node(name: 'Client', args: {'id': 3}, cols: [
+    _clientQuery = Node(name: 'Client', args: {
+      'id': 3
+    }, cols: [
       'name',
-      Node(name: "productionLines", args: {}, cols: ['name', 'ip'])
+      Node(name: "productionLines", args: {}, cols: [
+        'name',
+        'ip',
+        Node(name: 'signals', args: {}, cols: ['node_index'])
+      ])
     ]);
   }
 
@@ -37,11 +43,9 @@ class LineBloc extends BLoC<LineEvent> {
     Client _client = results['Client'];
     print('CLIENTS = ${results['Client']}');
 
-
     List<Line> _lines = _client.productionLines;
-    print('CLIENTS COUNT = ${_lines.length}');
-
-
+    print('LINES COUNT = ${_lines.length}');
+    print('SIGNALS COUNT = ${_lines[0].signals.length}');
 
     linesStateSubject.sink.add(LinesAreFetched(_lines));
   }

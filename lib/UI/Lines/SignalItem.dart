@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:ocpua_app/PODO/Sensor.dart';
+import 'package:ocpua_app/PODO/Signal.dart';
 import 'package:ocpua_app/UI/Lines/chart.dart';
-import 'package:ocpua_app/UI/Lines/sensorDetails.dart';
+import 'package:ocpua_app/UI/Lines/signalDetails.dart';
 
-class SensorItem extends StatefulWidget {
-  const SensorItem({this.sensor, this.index});
+class SignalItem extends StatefulWidget {
+  const SignalItem({this.signal, this.index});
 
-  final Sensor sensor;
+  final Signal signal;
   final int index;
 
   @override
-  _SensorItemState createState() => _SensorItemState();
+  _SignalItemState createState() => _SignalItemState();
 }
 
-class _SensorItemState extends State<SensorItem> {
+class _SignalItemState extends State<SignalItem> {
   List<LinearData> data = new List<LinearData>();
 
   void initState() {
@@ -28,7 +28,7 @@ class _SensorItemState extends State<SensorItem> {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return SensorDetails(
+              return SignalDetails(
                 index: widget.index,
               );
             },
@@ -55,11 +55,11 @@ class _SensorItemState extends State<SensorItem> {
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Text(
-                '${widget.sensor.sensorId}',
+                '${widget.signal.node_index}',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
               ),
               Text(
-                '${widget.sensor.value}',
+                '${widget.signal.node_index}',
                 style: TextStyle(color: Colors.green, fontSize: 16.0),
               ),
             ],
