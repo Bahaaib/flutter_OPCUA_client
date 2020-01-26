@@ -1,9 +1,9 @@
-import 'package:ocpua_app/PODO/Lines.dart';
+import 'package:ocpua_app/PODO/Line.dart';
 
 abstract class LineState{}
 
 class LinesAreFetched extends LineState{
-  final Lines lines;
+  final List<Line> linesList;
 
-  LinesAreFetched(this.lines);
+  LinesAreFetched(this.linesList);
 }

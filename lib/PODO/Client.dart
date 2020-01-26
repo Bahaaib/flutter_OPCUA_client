@@ -16,7 +16,7 @@ class Client implements Parser<Client> {
   Client.empty();
 
   Client parse(data) {
-    return Client.fromJson({"Client": data});
+    return Client.fromJson(data);
   }
 
   @override

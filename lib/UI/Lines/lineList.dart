@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ocpua_app/PODO/Line.dart';
-import 'package:ocpua_app/PODO/Lines.dart';
-import 'package:ocpua_app/PODO/Sensor.dart';
 import 'package:ocpua_app/UI/Lines/lineItem.dart';
 import 'package:ocpua_app/bloc/line/bloc.dart';
 import 'package:ocpua_app/resources/string.dart';
@@ -15,15 +13,15 @@ class LineList extends StatefulWidget {
 class _LineListState extends State<LineList> {
   List<Line> linesList = List<Line>();
   final LineBloc _linesBloc = GetIt.instance<LineBloc>();
-  Lines _lines;
 
   void initState() {
     _linesBloc.linesStateSubject.listen((receivedState) {
       if (receivedState is LinesAreFetched) {
-        _lines = receivedState.lines;
+        setState(() {
+          linesList = receivedState.linesList;
+        });
       }
     });
-
     _linesBloc.dispatch(LinesRequested());
 
     super.initState();
@@ -45,7 +43,7 @@ class _LineListState extends State<LineList> {
                 padding: EdgeInsets.only(top: 20),
                 itemCount: linesList.length,
                 itemBuilder: (BuildContext context, int i) {
-                  return LineItem(line: _lines.linesList.elementAt(i));
+                  return LineItem(line: linesList[i]);
                 }),
           ),
           logoutButton(),
