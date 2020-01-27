@@ -8,7 +8,6 @@ import 'package:ocpua_app/bloc/signals/signals_bloc.dart';
 import 'package:ocpua_app/bloc/signals/signals_event.dart';
 import 'package:ocpua_app/bloc/signals/signals_state.dart';
 
-
 class SignalDetails extends StatefulWidget {
   const SignalDetails({this.index});
 
@@ -90,7 +89,9 @@ class _SignalDetailsState extends State<SignalDetails> {
               Navigator.pop(context, true);
             }),
         backgroundColor: Colors.red,
-        title: Text('Test Signal'),
+        title: _signal != null
+            ? Text('${_signal.node_index}')
+            : Text(''),
         centerTitle: true,
       ),
       body: SingleChildScrollView(

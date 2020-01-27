@@ -9,7 +9,7 @@ class Signal implements Parser<Signal>{
   String value;
 
 
-  Signal(this.node_index);
+  Signal(this.node_index, this.value);
 
   factory Signal.fromJson(Map<String, dynamic> json) => _$SignalFromJson(json);
 

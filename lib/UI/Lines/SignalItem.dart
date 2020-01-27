@@ -54,12 +54,17 @@ class _SignalItemState extends State<SignalItem> {
         child: Center(
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Text(
-                '${widget.signal.node_index}',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+              Container(
+                width: 200.0,
+                child: FittedBox(
+                  child: Text(
+                    '${widget.signal.node_index}',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+                  ),
+                ),
               ),
               Text(
-                '${widget.signal.node_index}',
+                '${widget.signal.value}',
                 style: TextStyle(color: Colors.green, fontSize: 16.0),
               ),
             ],

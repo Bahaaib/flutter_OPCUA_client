@@ -48,7 +48,9 @@ public class MainActivity extends FlutterActivity {
     private ManagerOPC manager;
     private SessionChannel mySession;
     final private ArrayList<NodeId> nodeIdsList = new ArrayList<>();
+    final private ArrayList<String> nodeIds = new ArrayList<>();
     final private ArrayList<String> results = new ArrayList<>();
+    private String endPoint;
 
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
@@ -60,6 +62,9 @@ public class MainActivity extends FlutterActivity {
         new MethodChannel(getFlutterView(), LAUNCHER_CHANNEL).setMethodCallHandler(
                 (call, result) -> {
                     if (call.method.equals("launchClient")) {
+                        nodeIds.addAll(call.argument("ids"));
+                        endPoint = call.argument("ip");
+                        System.out.println("NATIVE CALL --> ENDPOINT: " + endPoint);
                         new ConnectionTask().execute();
                         result.success(null);
                     }
@@ -111,7 +116,7 @@ public class MainActivity extends FlutterActivity {
             System.out.println("discoverEndpoints...");
             /////////// DISCOVER ENDPOINT ////////
             // Discover endpoints
-            EndpointDescription[] endpoints = mClient.discoverEndpoints("opc.tcp://192.168.1.2:49320");
+            EndpointDescription[] endpoints = mClient.discoverEndpoints("opc.tcp://" + endPoint);
             System.out.println("STEP 1...");
             // Filter out all but opc.tcp protocol endpoints
             endpoints = EndpointUtil.selectByProtocol(endpoints, "opc.tcp");
@@ -144,15 +149,18 @@ public class MainActivity extends FlutterActivity {
             mySession.activate();
             System.out.println("Statuss: " + "ACTIVATED");
 
-            addNode("Simulation Examples.Functions.Ramp1");
-            addNode("Simulation Examples.Functions.Ramp2");
-            addNode("Simulation Examples.Functions.Ramp3");
-            addNode("Simulation Examples.Functions.Ramp4");
-            addNode("Simulation Examples.Functions.Ramp5");
-            addNode("Simulation Examples.Functions.Ramp6");
-            addNode("Simulation Examples.Functions.Ramp7");
-            addNode("Simulation Examples.Functions.Ramp8");
-            addNode("Simulation Examples.Functions.User1");
+            //addNode("Simulation Examples.Functions.Ramp1");
+            //addNode("Simulation Examples.Functions.Ramp2");
+            //addNode("Simulation Examples.Functions.Ramp3");
+            //addNode("Simulation Examples.Functions.Ramp4");
+            //addNode("Simulation Examples.Functions.Ramp5");
+            //addNode("Simulation Examples.Functions.Ramp6");
+            //addNode("Simulation Examples.Functions.Ramp7");
+            //addNode("Simulation Examples.Functions.Ramp8");
+            //addNode("Simulation Examples.Functions.User1");
+            for (String nodeId : nodeIds){
+                addNode(nodeId);
+            }
             startMonitoringForSession(mySession);
 
 
@@ -177,7 +185,7 @@ public class MainActivity extends FlutterActivity {
         nodeIdsList.remove(index);
     }
 
-    void closeSessionOnDemand(SessionChannel session){
+    void closeSessionOnDemand(SessionChannel session) {
         try {
             session.close();
             session.closeAsync();
@@ -202,18 +210,18 @@ public class MainActivity extends FlutterActivity {
                 DataValue[] dataValue = res.getResults();
                 message = dataValue[0].getValue().toString();
                 results.add(message);
-                System.out.println(nodeId.getValue().toString().substring(30)+ " VALUE: " + message);
+                System.out.println(nodeId.getValue().toString().substring(30) + " VALUE: " + message);
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
 
     }
 
-    void displaySnapshotTime(){
+    void displaySnapshotTime() {
         Date date = new Date();
         long currentDate = date.getTime();
         Timestamp timestamp = new Timestamp(currentDate);
 
-        System.out.println("CAPTURED AT:"+  timestamp);
+        System.out.println("CAPTURED AT:" + timestamp);
     }
 
     class ConnectionTask extends AsyncTask<Void, Void, Void> {

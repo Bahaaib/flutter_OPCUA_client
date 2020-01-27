@@ -41,7 +41,7 @@ class _SignalListState extends State<SignalList> {
     //Only launch session if a new instance of the app created
     if (_signalsBloc.appState == AppState.NEW_INSTANCE) {
       print('NEW INSTANCE');
-      _signalsBloc.dispatch(SignalsDataRequested());
+      _signalsBloc.dispatch(SignalsDataRequested(widget.line.signals, widget.line.ip));
       _signalsBloc.appState = AppState.ACTIVE;
     } else {
       print('APP IS ACTIVE');
@@ -55,7 +55,7 @@ class _SignalListState extends State<SignalList> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
-        title: Text('Testing Line'),
+        title: Text('${widget.line.name}'),
         centerTitle: true,
       ),
       body: ModalProgressHUD(
