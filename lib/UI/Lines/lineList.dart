@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:ocpua_app/PODO/Line.dart';
 import 'package:ocpua_app/UI/Lines/lineItem.dart';
 import 'package:ocpua_app/bloc/line/bloc.dart';
+import 'package:ocpua_app/bloc/signals/bloc.dart';
 import 'package:ocpua_app/resources/string.dart';
 
 class LineList extends StatefulWidget {
@@ -13,6 +14,7 @@ class LineList extends StatefulWidget {
 class _LineListState extends State<LineList> {
   List<Line> linesList = List<Line>();
   final LineBloc _linesBloc = GetIt.instance<LineBloc>();
+  final SignalsBloc _signalsBloc = GetIt.instance<SignalsBloc>();
 
   void initState() {
     _linesBloc.linesStateSubject.listen((receivedState) {
@@ -70,4 +72,6 @@ class _LineListState extends State<LineList> {
       ),
     );
   }
+
+
 }

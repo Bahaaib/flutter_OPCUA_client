@@ -11,3 +11,5 @@ class SignalsDataRequested extends SignalsEvent{
 }
 
 class ChartDataRequested extends SignalsEvent{}
+
+class SessionTerminationRequested extends SignalsEvent{}

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:get_it/get_it.dart';
 import 'package:ocpua_app/PODO/Signal.dart';
 import 'package:ocpua_app/UI/Lines/chart.dart';
 import 'package:ocpua_app/bloc/signals/signals_bloc.dart';
@@ -18,7 +19,7 @@ class SignalDetails extends StatefulWidget {
 }
 
 class _SignalDetailsState extends State<SignalDetails> {
-  final _signalsBloc = SignalsBloc.instance();
+  final _signalsBloc = GetIt.instance<SignalsBloc>();
   Signal _signal;
   final _data = List<LinearData>();
   Timer _timer;

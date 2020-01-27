@@ -9,19 +9,6 @@ import 'package:ocpua_app/bloc/signals/signals_state.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SignalsBloc extends BLoC<SignalsEvent> {
-  ///init as singleton
-  static SignalsBloc _signalsBloc;
-
-  static SignalsBloc instance() {
-    if (_signalsBloc == null) {
-      //print('CREATING NEW BLOC..');
-      _signalsBloc = SignalsBloc._();
-    }
-    return _signalsBloc;
-  }
-
-  SignalsBloc._();
-
   static const launcherPlatform =
       const MethodChannel('flutter.native/launcher');
   static const resultsPlatform = const MethodChannel('flutter.native/results');
@@ -32,6 +19,7 @@ class SignalsBloc extends BLoC<SignalsEvent> {
   bool isAppTerminated = true;
   AppState appState = AppState.NEW_INSTANCE;
   String ip;
+  String sessionStatus = 'RUNNING';
 
   final signalsStateSubject = PublishSubject<SignalsState>();
   final chartStateSubject = PublishSubject<SignalsState>();
@@ -45,6 +33,10 @@ class SignalsBloc extends BLoC<SignalsEvent> {
     }
 
     if (event is ChartDataRequested) {}
+
+    if (event is SessionTerminationRequested) {
+      sessionStatus = 'TERMINATED';
+    }
   }
 
   void _setEndpoint(String ip) {
@@ -66,8 +58,10 @@ class SignalsBloc extends BLoC<SignalsEvent> {
 
   Future<void> _runNativeLauncher() async {
     try {
-      await launcherPlatform.invokeMethod(
-          'launchClient', {'ids': _requestedSignalsIds, 'ip': ip});
+      await launcherPlatform.invokeMethod('launchClient', {
+        'ids': _requestedSignalsIds,
+        'ip': ip,
+      });
       _launchMonitoring();
     } on PlatformException catch (e) {
       print(e);
@@ -76,15 +70,24 @@ class SignalsBloc extends BLoC<SignalsEvent> {
 
   Future<void> _getResults() async {
     try {
-      final result = await resultsPlatform.invokeMethod('getResults');
+      final result = await resultsPlatform
+          .invokeMethod('getResults', {'sessionStatus': sessionStatus});
       if ((result as List).isNotEmpty) {
-        _nodesList.clear();
-        _nodesList.addAll(result);
-        getSignalsList(_nodesList);
-        print('NODES SIZE = ${_nodesList.length}');
+        if (result[0] == 'BYE') {
+          _requestedSignalsIds.clear();
+         _timer.cancel();
+         print('IN TERMINATION STATE XXXX');
 
-        signalsStateSubject.add(SignalsDataAreFetched(_signalsList));
-        chartStateSubject.add(SignalsDataAreFetched(_signalsList));
+        } else {
+          print('IN RUNNUNG STATE ///');
+          _nodesList.clear();
+          _nodesList.addAll(result);
+          getSignalsList(_nodesList);
+          print('NODES SIZE = ${_nodesList.length}');
+
+          signalsStateSubject.add(SignalsDataAreFetched(_signalsList));
+          chartStateSubject.add(SignalsDataAreFetched(_signalsList));
+        }
       }
     } on PlatformException catch (e) {
       print(e);

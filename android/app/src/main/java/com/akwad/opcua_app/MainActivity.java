@@ -51,6 +51,7 @@ public class MainActivity extends FlutterActivity {
     final private ArrayList<String> nodeIds = new ArrayList<>();
     final private ArrayList<String> results = new ArrayList<>();
     private String endPoint;
+    private String sessionStatus = "RUNNING";
 
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
@@ -62,6 +63,7 @@ public class MainActivity extends FlutterActivity {
         new MethodChannel(getFlutterView(), LAUNCHER_CHANNEL).setMethodCallHandler(
                 (call, result) -> {
                     if (call.method.equals("launchClient")) {
+                        results.clear();
                         nodeIds.addAll(call.argument("ids"));
                         endPoint = call.argument("ip");
                         System.out.println("NATIVE CALL --> ENDPOINT: " + endPoint);
@@ -74,6 +76,8 @@ public class MainActivity extends FlutterActivity {
         new MethodChannel(getFlutterView(), RESULTS_CHANNEL).setMethodCallHandler(
                 (call, result) -> {
                     if (call.method.equals("getResults")) {
+                        sessionStatus = call.argument("sessionStatus");
+                        System.out.println("NATIVE CALL --> SESSION STATUS: " + sessionStatus);
                         result.success(results);
                     }
 
@@ -158,14 +162,10 @@ public class MainActivity extends FlutterActivity {
             //addNode("Simulation Examples.Functions.Ramp7");
             //addNode("Simulation Examples.Functions.Ramp8");
             //addNode("Simulation Examples.Functions.User1");
-            for (String nodeId : nodeIds){
+            for (String nodeId : nodeIds) {
                 addNode(nodeId);
             }
             startMonitoringForSession(mySession);
-
-
-            // Close the session
-
 
             return message;
 
@@ -186,9 +186,11 @@ public class MainActivity extends FlutterActivity {
     }
 
     void closeSessionOnDemand(SessionChannel session) {
+        System.out.println("CLOSING SESSION...");
         try {
             session.close();
             session.closeAsync();
+            System.out.println("SESSION CLOSED!");
         } catch (ServiceResultException e) {
             e.printStackTrace();
         }
@@ -198,20 +200,34 @@ public class MainActivity extends FlutterActivity {
 
         executor.scheduleAtFixedRate(() -> {
             results.clear();
-            for (NodeId nodeId : nodeIdsList) {
-                ReadValueId readValueId = new ReadValueId(nodeId, Attributes.Value, null, null);
 
-                ReadResponse res = null;
-                try {
-                    res = currentSession.Read(null, 500.0, TimestampsToReturn.Source, readValueId);
-                } catch (ServiceResultException e) {
-                    e.printStackTrace();
-                }
-                DataValue[] dataValue = res.getResults();
-                message = dataValue[0].getValue().toString();
+            // Close the session if requested
+            if (sessionStatus.equals("TERMINATED")) {
+                executor.shutdown();
+                executor = Executors.newSingleThreadScheduledExecutor();
+                closeSessionOnDemand(mySession);
+                message = "BYE";
                 results.add(message);
-                System.out.println(nodeId.getValue().toString().substring(30) + " VALUE: " + message);
+                nodeIdsList.clear();
+                nodeIds.clear();
+            } else {
+                for (NodeId nodeId : nodeIdsList) {
+                    ReadValueId readValueId = new ReadValueId(nodeId, Attributes.Value, null, null);
+
+                    ReadResponse res = null;
+                    try {
+                        res = currentSession.Read(null, 500.0, TimestampsToReturn.Source, readValueId);
+                    } catch (ServiceResultException e) {
+                        e.printStackTrace();
+                    }
+                    DataValue[] dataValue = res.getResults();
+                    message = dataValue[0].getValue().toString();
+                    results.add(message);
+                    System.out.println(nodeId.getValue().toString().substring(30) + " VALUE: " + message);
+                }
             }
+
+
         }, 0, 1000, TimeUnit.MILLISECONDS);
 
     }
